@@ -8,6 +8,9 @@ public class Turrent : MonoBehaviour
     public float range = 15f;
 
     public string enemyTag = "Enemy";
+    public float turnSpeed = 10f;
+
+    public Transform partToRotate;
 
     void Start()
     {
@@ -20,19 +23,23 @@ public class Turrent : MonoBehaviour
         float shortestDistance = Mathf.Infinity;
         GameObject nearestEnemy = null;
 
-        foreach(GameObject enemy in enemies)
+        foreach (GameObject enemy in enemies)
         {
             float distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
-            if(distanceToEnemy < shortestDistance)
+            if (distanceToEnemy < shortestDistance)
             {
                 shortestDistance = distanceToEnemy;
                 nearestEnemy = enemy;
             }
         }
 
-        if(nearestEnemy != null && shortestDistance <= range)
+        if (nearestEnemy != null && shortestDistance <= range)
         {
             target = nearestEnemy.transform;
+        }
+        else
+        {
+            target = null;
         }
 
     }
@@ -41,7 +48,11 @@ public class Turrent : MonoBehaviour
     {
         if (target == null)
             return;
-        //17:06s
+
+        Vector3 dir = target.position - transform.position;
+        Quaternion lookRotation = Quaternion.LookRotation(dir);
+        Vector3 rotation = Quaternion.Lerp(partToRotate.rotation, lookRotation, Time.deltaTime * turnSpeed).eulerAngles;
+        partToRotate.rotation = Quaternion.Euler(0f, rotation.y, 0f);
     }
 
     void OnDrawGizmosSelected()
